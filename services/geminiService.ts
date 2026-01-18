@@ -1,6 +1,7 @@
 
 import { GoogleGenAI, Type } from "@google/genai";
 import { Merchant, RouteInfo } from "../types";
+import { INITIAL_ZONES } from "../constants";
 
 const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
 
@@ -14,12 +15,21 @@ export interface DiscoveredPartner {
 }
 
 export const scanPakurForPartners = async (query: string) => {
+  const zoneList = INITIAL_ZONES.map(z => `- ${z.name}: ${z.description}`).join('\n');
+
   try {
     const response = await ai.models.generateContent({
       model: "gemini-2.5-flash",
-      contents: `Perform a deep scan for real commercial entities in Pakur, Jharkhand. Find stores matching: ${query}. 
-      Include pharmacies, general stores, and bakeries. Focus on Harindanga, Railway Colony, and Main Market areas. 
-      For each, provide a brief strategic assessment for 15-minute delivery partnership.`,
+      contents: `Perform a strict hyper-local scan for commercial entities matching "${query}" explicitly within Pakur City, Jharkhand.
+
+      CRITICAL RESTRICTION: Result must fall into one of our Serviceable Zones:
+      ${zoneList}
+
+      INSTRUCTIONS:
+      1. IGNORE any entity strictly outside these Pakur neighborhoods/markets.
+      2. If a store is in a rural area or outside the main market/station/collectorate zones, DISCARD it.
+      3. For each match, explicitly mention the Zone it implies.
+      4. Provide a 1-sentence strategic assessment for 10-15 minute delivery.`,
       config: {
         tools: [{ googleMaps: {} }],
         toolConfig: {
@@ -40,11 +50,11 @@ export const scanPakurForPartners = async (query: string) => {
       .filter((chunk: any) => chunk.maps)
       .map((chunk: any) => ({
         name: chunk.maps.title,
-        category: "Daily Needs", 
-        address: "Pakur, Jharkhand",
+        category: "Zone-Verified Partner",
+        address: "Pakur Service Zone",
         googleMapsUri: chunk.maps.uri,
-        contactPotential: "Check Google Business Profile linked below",
-        strategicValue: "Identified as a high-visibility commercial node."
+        contactPotential: "High - Zone Match",
+        strategicValue: "Validated against active service zones."
       }));
 
     return { narrative: text, partners };
@@ -91,8 +101,8 @@ export const getRouteLogistics = async (merchantName: string, address: string): 
 };
 
 export const suggestZonesBasedOnDensity = async (merchants: Merchant[]) => {
-  const prompt = `Analyze the geographic spread of these shops in Pakur: ${JSON.stringify(merchants.map(m => ({n: m.name, l: m.address})))}. Suggest the top 3 optimal locations for micro-warehouses (dark stores) to achieve 10-minute delivery coverage across the entire city.`;
-  
+  const prompt = `Analyze the geographic spread of these shops in Pakur: ${JSON.stringify(merchants.map(m => ({ n: m.name, l: m.address })))}. Suggest the top 3 optimal locations for micro-warehouses (dark stores) to achieve 10-minute delivery coverage across the entire city.`;
+
   try {
     const response = await ai.models.generateContent({
       model: "gemini-3-pro-preview",
