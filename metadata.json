@@ -1,0 +1,7 @@
+{
+  "name": "PakurFast - Q-Commerce Logistics Command",
+  "description": "A high-performance logistics planning platform for Pakur City, using AI and Google Maps to coordinate a 15-minute delivery network.",
+  "requestFramePermissions": [
+    "geolocation"
+  ]
+}
