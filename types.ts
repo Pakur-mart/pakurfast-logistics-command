@@ -10,9 +10,17 @@ export interface Merchant {
   lng: number;
   rating?: number;
   contact?: string;
+  phoneNumber?: string;
+  email?: string;
   zoneId: string;
   isCollaborated: boolean;
   mapUrl?: string;
+}
+
+export interface ProposalTemplate {
+  title: string;
+  content: string;
+  whatsappMessage: string;
 }
 
 export interface ServiceableZone {

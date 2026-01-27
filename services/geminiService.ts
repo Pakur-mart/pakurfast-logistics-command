@@ -12,6 +12,8 @@ export interface DiscoveredPartner {
   googleMapsUri: string;
   contactPotential: string;
   strategicValue: string;
+  phoneNumber?: string;
+  email?: string;
 }
 
 export const scanPakurForPartners = async (query: string) => {
@@ -28,15 +30,17 @@ export const scanPakurForPartners = async (query: string) => {
       INSTRUCTIONS:
       1. IGNORE any entity strictly outside these Pakur neighborhoods/markets.
       2. If a store is in a rural area or outside the main market/station/collectorate zones, DISCARD it.
-      3. For each match, explicitly mention the Zone it implies.
-      4. Provide a 1-sentence strategic assessment for 10-15 minute delivery.`,
+      3. CRITICAL: Try to find stores that have a contact phone number or email listed in Google Maps.
+      4. For each match, explicitly mention the Zone it implies.
+      5. Provide a 1-sentence strategic assessment for 10-15 minute delivery.
+      6. Return results that include phoneNumber and email if possible.`,
       config: {
         tools: [{ googleMaps: {} }],
         toolConfig: {
           retrievalConfig: {
             latLng: {
-              latitude: 24.7861,
-              longitude: 87.8512
+              latitude: 24.6394,
+              longitude: 87.8465
             }
           }
         }

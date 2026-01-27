@@ -23,7 +23,12 @@ const MapView: React.FC<MapViewProps> = ({ zones, merchants, selectedZoneId, onS
 
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-    }).addTo(mapRef.current);
+    }).addTo(mapRef.current!);
+
+    // Force map invalidation to ensure it renders correctly
+    setTimeout(() => {
+      mapRef.current?.invalidateSize();
+    }, 100);
 
     return () => {
       mapRef.current?.remove();
@@ -47,7 +52,7 @@ const MapView: React.FC<MapViewProps> = ({ zones, merchants, selectedZoneId, onS
         fillOpacity: isSelected ? 0.3 : 0.1,
         weight: isSelected ? 3 : 1
       }).addTo(mapRef.current!);
-      
+
       polygon.bindTooltip(zone.name, { permanent: false, direction: 'center' });
       layersRef.current[`zone-${zone.id}`] = polygon;
     });
